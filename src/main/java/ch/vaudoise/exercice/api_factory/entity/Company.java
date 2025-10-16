@@ -1,3 +1,12 @@
+/**
+ * =============================================================
+ *  File: Company.java
+ *  Author: Daniel Mihalcioiu
+ *  Description: Represents a company-type client with a unique
+ *               company identifier following the pattern 'aaa-123'.
+ * =============================================================
+ */
+
 package ch.vaudoise.exercice.api_factory.entity;
 
 import jakarta.persistence.Entity;
@@ -11,6 +20,7 @@ import lombok.Setter;
 @Entity
 public class Company extends Client {
 
+    /** Company identifier in the format 'aaa-123' (three letters, hyphen, three digits). */
     @NotBlank
     @Pattern(
         regexp = "^[a-zA-Z]{3}-\\d{3}$",

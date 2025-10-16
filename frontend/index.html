@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vaudoise API Tester</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    section {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    button {
+      background: #006241;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background: #007b50;
+    }
+    input, select {
+      padding: 0.4rem;
+      margin: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    pre {
+      background: #1e1e1e;
+      color: #0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      max-height: 400px;
+    }
+    hr {
+      margin: 1rem 0;
+      border: none;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Vaudoise API Tester 🧪</h1>
+
+  <!-- CLIENTS SECTION -->
+  <section>
+    <h2>👤 Clients 👤</h2>
+    <div>
+      <h4>Create a Person</h4>
+      <input id="pName" placeholder="Name">
+      <input id="pEmail" placeholder="Email">
+      <input id="pPhone" placeholder="Phone">
+      <input id="pBirth" placeholder="Birth date (YYYY-MM-DD)">
+      <button onclick="createPerson()">Create</button>
+    </div>
+    <hr>
+    <div>
+      <h4>Create a Company</h4>
+      <input id="cName" placeholder="Company name">
+      <input id="cEmail" placeholder="Email">
+      <input id="cPhone" placeholder="Phone">
+      <input id="cIdent" placeholder="Company identifier (aaa-123)">
+      <button onclick="createCompany()">Create</button>
+    </div>
+    <hr>
+    <div>
+      <h4>Update a Client</h4>
+      <input id="uId" placeholder="Client ID">
+      <input id="uName" placeholder="Name">
+      <input id="uEmail" placeholder="Email">
+      <input id="uPhone" placeholder="Phone">
+      <button onclick="updateClient()">Update</button>
+    </div>
+    <hr>
+    <div>
+      <h4>Delete / Restore a Client</h4>
+      <input id="dId" placeholder="Client ID">
+      <button onclick="deleteClient()">Delete</button>
+      <button onclick="restoreClient()">Restore</button>
+    </div>
+    <hr>
+    <button onclick="getClients()">📋 View All Clients 📋</button>
+  </section>
+
+  <!-- CONTRACTS SECTION -->
+  <section>
+    <h2>📜 Contracts 📜</h2>
+    <div>
+      <h4>Create a Contract</h4>
+      <input id="clientId" placeholder="Client ID">
+      <input id="amount" placeholder="Amount (€)">
+      <input id="startDate" placeholder="Start date (YYYY-MM-DD)">
+      <input id="endDate" placeholder="End date (YYYY-MM-DD)">
+      <button onclick="createContract()">Create</button>
+    </div>
+    <hr>
+    <div>
+      <h4>Update Contract Amount</h4>
+      <input id="contractId" placeholder="Contract ID">
+      <input id="newAmount" placeholder="New amount (€)">
+      <button onclick="updateContractAmount()">Update</button>
+    </div>
+    <hr>
+    <div>
+      <input id="viewClientId" placeholder="Client ID">
+      <button onclick="getContractsByClient()">View Active Contracts</button>
+      <button onclick="getAllContractsByClient()">View All Client Contracts</button>
+      <button onclick="getAllContracts()">View All Contracts</button>
+    </div>
+  </section>
+
+  <!-- OUTPUT SECTION -->
+  <section>
+    <h2>🧾 Output 🧾</h2>
+    <pre id="output">Waiting for a request...</pre>
+  </section>
+
+  <script>
+    const BASE_URL = "http://localhost:8080";
+
+    /**
+     * Generic API call handler.
+     * Displays the JSON response nicely formatted in the output section.
+     */
+    async function callAPI(endpoint, method = 'GET', body = null) {
+      try {
+        const res = await fetch(`${BASE_URL}${endpoint}`, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : null
+        });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
+        document.getElementById('output').textContent =
+          `${method} ${endpoint}\n\n` + JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('output').textContent = 'Error: ' + err;
+      }
+    }
+
+    // --- CLIENTS ---
+    function createPerson() {
+      const p = {
+        name: pName.value,
+        email: pEmail.value,
+        phone: pPhone.value,
+        birthDate: pBirth.value
+      };
+      callAPI('/clients/person', 'POST', p);
+    }
+
+    function createCompany() {
+      const c = {
+        name: cName.value,
+        email: cEmail.value,
+        phone: cPhone.value,
+        companyIdentifier: cIdent.value
+      };
+      callAPI('/clients/company', 'POST', c);
+    }
+
+    function getClients() {
+      callAPI('/clients');
+    }
+
+    function updateClient() {
+      const u = {
+        name: uName.value,
+        email: uEmail.value,
+        phone: uPhone.value
+      };
+      callAPI(`/clients/${uId.value}`, 'PUT', u);
+    }
+
+    function deleteClient() {
+      callAPI(`/clients/${dId.value}`, 'DELETE');
+    }
+
+    function restoreClient() {
+      callAPI(`/clients/${dId.value}/restore`, 'PUT');
+    }
+
+    // --- CONTRACTS ---
+    function createContract() {
+      const contract = {
+        clientId: Number(clientId.value),
+        costAmount: Number(amount.value),
+        startDate: startDate.value || null,
+        endDate: endDate.value || null
+      };
+      callAPI('/contracts', 'POST', contract);
+    }
+
+    function updateContractAmount() {
+      const id = contractId.value;
+      const val = newAmount.value;
+      callAPI(`/contracts/${id}/amount?value=${val}`, 'PUT');
+    }
+
+    function getContractsByClient() {
+      callAPI(`/contracts/client/${viewClientId.value}`);
+    }
+
+    function getAllContractsByClient() {
+      callAPI(`/contracts/client/${viewClientId.value}/all`);
+    }
+
+    function getAllContracts() {
+      callAPI('/contracts');
+    }
+  </script>
+</body>
+</html>

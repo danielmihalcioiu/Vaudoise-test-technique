@@ -1,3 +1,12 @@
+/**
+ * =============================================================
+ *  File: ClientRepository.java
+ *  Author: Daniel Mihalcioiu
+ *  Description: Spring Data JPA repository for managing Client entities.
+ *               Provides methods for retrieving and validating active clients.
+ * =============================================================
+ */
+
 package ch.vaudoise.exercice.api_factory.repository;
 
 import ch.vaudoise.exercice.api_factory.entity.Client;
@@ -8,6 +17,19 @@ import java.util.List;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    boolean existsByEmailAndIsActive(String email);
-    List<Client> findByIsActive();
+
+    /**
+     * Checks if an active client already exists with the given email address.
+     *
+     * @param email the email to check
+     * @return true if an active client with this email exists, false otherwise
+     */
+    boolean existsByEmailAndActiveTrue(String email);
+
+    /**
+     * Retrieves all clients currently marked as active (not soft-deleted).
+     *
+     * @return list of active clients
+     */
+    List<Client> findByActiveTrue();
 }

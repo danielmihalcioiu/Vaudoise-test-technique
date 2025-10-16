@@ -1,3 +1,12 @@
+/**
+ * =============================================================
+ *  File: ContractController.java
+ *  Author: Daniel Mihalcioiu
+ *  Description: REST Controller for managing insurance contracts.
+ *               Handles creation, retrieval, filtering, and updates.
+ * =============================================================
+ */
+
 package ch.vaudoise.exercice.api_factory.controller;
 
 import ch.vaudoise.exercice.api_factory.dto.ContractDTO;
@@ -22,6 +31,13 @@ public class ContractController {
         this.contractService = contractService;
     }
 
+    /**
+     * Creates a new contract for an existing client.
+     * Automatically sets startDate to current date if not provided.
+     *
+     * @param dto the contract creation data
+     * @return the created contract view
+     */
     @PostMapping
     public ResponseEntity<ContractView> createContract(@RequestBody ContractDTO dto) {
         if (dto.getClientId() == null) {
@@ -43,6 +59,11 @@ public class ContractController {
         return ResponseEntity.ok(ContractView.from(saved));
     }
 
+    /**
+     * Retrieves all contracts (active and inactive).
+     *
+     * @return list of all contracts
+     */
     @GetMapping
     public ResponseEntity<List<ContractView>> getAllContracts() {
         var contracts = contractService.getAllContracts()
@@ -52,6 +73,14 @@ public class ContractController {
         return ResponseEntity.ok(contracts);
     }
 
+    /**
+     * Retrieves all active contracts for a client.
+     * Optionally filters by updateDate if the "updatedAfter" parameter is provided.
+     *
+     * @param clientId     the client's ID
+     * @param updatedAfter optional filter for last modification date
+     * @return list of active (and optionally filtered) contract views
+     */
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<ContractView>> getActiveContractsByClient(
             @PathVariable Long clientId,
@@ -73,6 +102,12 @@ public class ContractController {
         return ResponseEntity.ok(views);
     }
 
+    /**
+     * Retrieves all contracts (active and ended) for a specific client.
+     *
+     * @param clientId the client's ID
+     * @return list of all contract views
+     */
     @GetMapping("/client/{clientId}/all")
     public ResponseEntity<List<ContractView>> getAllContractsByClient(@PathVariable Long clientId) {
         var contracts = contractService.getAllContractsForClient(clientId)
@@ -82,6 +117,14 @@ public class ContractController {
         return ResponseEntity.ok(contracts);
     }
 
+    /**
+     * Retrieves contracts updated after a given date for a specific client.
+     * Only includes active contracts.
+     *
+     * @param clientId the client's ID
+     * @param date     the cutoff update date
+     * @return list of updated contract views
+     */
     @GetMapping("/client/{clientId}/updated-after")
     public ResponseEntity<List<ContractView>> getContractsByUpdateDate(
             @PathVariable Long clientId,
@@ -95,6 +138,14 @@ public class ContractController {
         return ResponseEntity.ok(contracts);
     }
 
+    /**
+     * Updates the cost amount of a specific contract.
+     * Automatically updates the "updateDate" to the current timestamp.
+     *
+     * @param id    the contract ID
+     * @param value the new cost amount
+     * @return the updated contract view
+     */
     @PutMapping("/{id}/amount")
     public ResponseEntity<ContractView> updateContractAmount(@PathVariable Long id, @RequestParam Double value) {
         try {
@@ -105,6 +156,12 @@ public class ContractController {
         }
     }
 
+    /**
+     * Calculates the total amount of all active contracts for a specific client.
+     *
+     * @param clientId the client's ID
+     * @return the sum of all active contract costs
+     */
     @GetMapping("/client/{clientId}/total")
     public ResponseEntity<Double> getContractsTotal(@PathVariable Long clientId) {
         return ResponseEntity.ok(contractService.getActiveContractsTotal(clientId));

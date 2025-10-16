@@ -1,7 +1,12 @@
 
 # Vaudoise-test-technique
 
-  
+This project is a backend API developed as part of a technical assessment for Vaudoise.  
+It simulates a simple insurance management system that handles clients (both individuals and companies) and their contracts.  
+The goal is to provide a clean, maintainable, and well-structured RESTful API that allows creating, updating, deleting, and retrieving clients and their associated contracts — while respecting business rules such as contract date management and soft deletion of clients.
+
+Built with **Spring Boot**, **PostgreSQL**, and **Docker**, the project focuses on clean architecture, validation, and performance.
+
 
 ## Prerequisites
 
@@ -11,10 +16,6 @@
 -  **Git** (to clone the repo)
 
 > On Windows: make sure `java -version` and `mvn -v` work in your terminal.
-
-
-
-  
 
 ## Quick start
 

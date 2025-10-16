@@ -68,6 +68,16 @@ spring.jpa.open-in-view=false
 
 > If you changed the DB credentials, update them here.
 
+To reset the database on app restart, replace :
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+```
+With :
+
+```properties
+spring.jpa.hibernate.ddl-auto=create
+```
 3)  **Run the app**
 
 ```bash
